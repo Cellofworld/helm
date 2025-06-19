@@ -1,0 +1,71 @@
+# Количество реплик
+replicaCount: 2
+
+# Настройки образа Nginx
+image:
+  repository: nginx
+  tag: "1.25.3"
+  pullPolicy: IfNotPresent
+
+# Настройки сервиса
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+  nodePort: null
+
+# Настройки ingress
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: nginx.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Конфигурация Nginx (будет помещена в ConfigMap)
+nginxConfig:
+  server:
+    listen: 80
+    server_name: localhost
+    location: /
+      root: /usr/share/nginx/html
+      index: index.html index.htm
+
+# Пользовательская HTML-страница
+customHtml: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>Welcome to Nginx!</title>
+  </head>
+  <body>
+      <h1>Hello from Nginx Helm Chart!</h1>
+      <p>Version: {{ .Chart.AppVersion }}</p>
+  </body>
+  </html>
+
+# Ресурсы
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Настройки readiness и liveness проб
+probes:
+  readiness:
+    path: /
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  liveness:
+    path: /
+    port: 80
+    initialDelaySeconds: 15
+    periodSeconds: 20
